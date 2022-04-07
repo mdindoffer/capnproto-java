@@ -85,13 +85,13 @@
               <phase>generate-test-sources</phase>
               <configuration>
                 <target>
-                  <mkdir dir="src/test/generated"/>
+                  <mkdir dir="target/test/java/generated"/>
                   <exec executable="capnp" failonerror="true">
                     <arg value="compile"/>
                     <arg value="-I"/>
                     <arg value="src/main/schema/"/>
                     <arg value="--src-prefix=src/test/schema/"/>
-                    <arg value="-o../capnpc-java:src/test/generated"/>
+                    <arg value="-o../capnpc-java:target/test/java/generated"/>
                     <arg value="src/test/schema/test.capnp"/>
                     <arg value="src/test/schema/test-import.capnp"/>
                   </exec>
@@ -117,7 +117,7 @@
               </goals>
               <configuration>
                 <sources>
-                  <source>src/test/generated</source>
+                  <source>target/test/java/generated</source>
                 </sources>
               </configuration>
             </execution>

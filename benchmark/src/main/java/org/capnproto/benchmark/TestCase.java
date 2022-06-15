@@ -195,6 +195,7 @@ public abstract class TestCase<RequestFactory extends
         }
         long iters = Long.parseLong(args[3]);
 
+        long start = System.currentTimeMillis();
         try {
             if (mode.equals("object")) {
                 passByObject(requestFactory, responseFactory, reuse, compression, iters);
@@ -210,5 +211,7 @@ public abstract class TestCase<RequestFactory extends
         } catch (IOException e) {
             System.err.println("IOException: " + e);
         }
+        long durationL = System.currentTimeMillis() - start;
+        System.out.println("Benchmark took: " + durationL +"ms");
     }
 }

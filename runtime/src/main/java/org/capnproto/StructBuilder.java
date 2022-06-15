@@ -235,11 +235,12 @@ public class StructBuilder {
         if (sharedDataSize == 1) {
             this._setBooleanField(0, other._getBooleanField(0));
         } else {
-            WireHelpers.memcpy(this.segment.buffer,
-                               this.data,
-                               other.segment.buffer,
-                               other.data,
-                               sharedDataSize / Constants.BITS_PER_BYTE);
+            WireHelpers.copyBufferRange(
+                    other.segment.buffer,
+                    other.data,
+                    this.segment.buffer,
+                    this.data,
+                    sharedDataSize / Constants.BITS_PER_BYTE);
         }
 
         // Zero out all pointers in the target.

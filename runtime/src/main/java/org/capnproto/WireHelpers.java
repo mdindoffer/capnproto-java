@@ -802,10 +802,7 @@ final class WireHelpers {
                 return new Text.Builder();
             } else {
                 Text.Builder builder = initTextPointer(refOffset, segment, defaultSize);
-                // TODO is there a way to do this with bulk methods?
-                for (int i = 0; i < builder.size; ++i) {
-                    builder.buffer.put(builder.offset + i, defaultBuffer.get(defaultOffset * 8 + i));
-                }
+                copyBufferRange(defaultBuffer, defaultOffset * 8, builder.buffer, builder.offset, builder.size);
                 return builder;
             }
         }
@@ -850,11 +847,7 @@ final class WireHelpers {
                                        SegmentBuilder segment,
                                        Data.Reader value) {
         Data.Builder builder = initDataPointer(refOffset, segment, value.size);
-
-        // TODO is there a way to do this with bulk methods?
-        for (int i = 0; i < builder.size; ++i) {
-            builder.buffer.put(builder.offset + i, value.buffer.get(value.offset + i));
-        }
+        copyBufferRange(value.buffer, value.offset, builder.buffer, builder.offset, builder.size);
         return builder;
     }
 
@@ -870,10 +863,7 @@ final class WireHelpers {
                 return new Data.Builder();
             } else {
                 Data.Builder builder = initDataPointer(refOffset, segment, defaultSize);
-                // TODO is there a way to do this with bulk methods?
-                for (int i = 0; i < builder.size; ++i) {
-                    builder.buffer.put(builder.offset + i, defaultBuffer.get(defaultOffset * 8 + i));
-                }
+                copyBufferRange(defaultBuffer, defaultOffset * 8, builder.buffer, builder.offset, builder.size);
                 return builder;
             }
         }
@@ -1337,4 +1327,33 @@ final class WireHelpers {
         return new Data.Reader(resolved.segment.buffer, resolved.ptr, size);
     }
 
+    /**
+     * Copies a range of data from source ByteBuffer to a (different) destination Bytebuffer, preserving the original positions
+     * and limits of both buffers.
+     * Source and destination must not be the same object.
+     *
+     * @param source     source to copy from, must be different from dest
+     * @param srcOffset  starting position of data to copy
+     * @param dest       destination, must be different from source
+     * @param destOffset position to copy data to
+     * @param length     length of data range to copy
+     * @throws IllegalArgumentException when the source and destination are the same buffer
+     */
+    static void copyBufferRange(ByteBuffer source, int srcOffset, ByteBuffer dest, int destOffset, int length) {
+        source.mark();
+        dest.mark();
+        int originalSrcLimit = source.limit();
+
+        //TODO  If the mark is defined and larger than the new position then it is discarded. Do we want this?
+        source.position(srcOffset);
+        dest.position(destOffset);
+        //TODO  If the mark is defined and larger than the new limit then it is discarded.
+        source.limit(srcOffset + length);
+
+        dest.put(source);
+
+        source.reset();
+        dest.reset();
+        source.limit(originalSrcLimit);
+    }
 }
